@@ -6,5 +6,44 @@
       "password": "$2b$10$Htz6oUMpWk9okb16mt5MeO.8/RwsQvtbnIERCXjTif/cjVXYSrdVO",
       "role": "ADMIN"
     }
+  ],
+  "songs": [
+    {
+      "id": 1,
+      "title": "Có em",
+      "artist": "Madihu",
+      "genreIDs": [1, 3],
+      "url": "https://firebasestorage.googleapis.com/...",
+      "coverUrl": "https://firebasestorage.googleapis.com/cover1.jpg",
+      "uploaderId": 2
+    },
+    {
+      "id": 2,
+      "title": "China Pipa",
+      "artist": "StarlingEDM",
+      "genreIDs": [3, 4],
+      "url": "https://firebase...123",
+      "coverUrl": "https://...123",
+      "uploaderId": 1,
+      "createdAt": "2025-10-27T15:38:31.155Z"
+    }
+  ],
+  "genres": [
+    {
+      "id": 1,
+      "name": "Pop"
+    },
+    {
+      "id": 2,
+      "name": "Ballad"
+    },
+    {
+      "id": 3,
+      "name": "R&B"
+    },
+    {
+      "id": 4,
+      "name": "EDM"
+    }
   ]
 }

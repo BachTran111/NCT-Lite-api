@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 
 import authRouter from "./routes/auth.route.js";
+import songRouter from "./routes/song.route.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(cors({ origin: "*" }));
 app.use(morgan("dev"));
 
 app.use("/api/auth", authRouter);
+app.use("/api/songs", songRouter);
 
 app.get("/", (req, res) => res.send("API running....!"));
 
