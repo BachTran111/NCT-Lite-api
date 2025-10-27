@@ -26,6 +26,29 @@
       "coverUrl": "https://...123",
       "uploaderId": 1,
       "createdAt": "2025-10-27T15:38:31.155Z"
+    },
+    {
+      "id": 3,
+      "title": "Hẹn Em Kiếp Sau",
+      "artist": "Vũ Phụng Tiên",
+      "genreIDs": [2],
+      "url": "https://firebasestorage.googleapis.com/henem.mp3",
+      "coverUrl": "https://firebasestorage.googleapis.com/henem-cover.jpg",
+      "uploaderId": 3
+    }
+  ],
+  "albums": [
+    {
+      "id": 1,
+      "title": "Love Collection",
+      "artist": "Vũ Phụng Tiên",
+      "songIDs": [1, 2],
+      "genreIDs": [1, 2],
+      "coverUrl": "https://firebasestorage.googleapis.com/love-collection.jpg",
+      "releaseDate": "2025-10-20",
+      "description": "Tuyển tập những bài hát tình yêu buồn.",
+      "creatorId": null,
+      "isPublic": true
     }
   ],
   "genres": [

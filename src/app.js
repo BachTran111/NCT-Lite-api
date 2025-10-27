@@ -4,6 +4,7 @@ import morgan from "morgan";
 
 import authRouter from "./routes/auth.route.js";
 import songRouter from "./routes/song.route.js";
+import albumRouter from "./routes/album.route.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRouter);
 app.use("/api/songs", songRouter);
+app.use("/api/albums", albumRouter);
 
 app.get("/", (req, res) => res.send("API running....!"));
 
