@@ -1,6 +1,12 @@
-import AuthService from "../services/auth.service.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import User from "../models/user.model.js";
 
-export function authRequired(req, res, next) {
+dotenv.config();
+const SECRET = process.env.JWT_SECRET || "super_secret_key";
+
+// Middleware xác thực token
+export const authRequired = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader)
     return res
@@ -14,19 +20,27 @@ export function authRequired(req, res, next) {
       .json({ status: "ERROR", message: "Invalid token format" });
 
   try {
-    const decoded = AuthService.verifyToken(token);
-    req.user = decoded;
+    const decoded = jwt.verify(token, SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user)
+      return res
+        .status(401)
+        .json({ status: "ERROR", message: "User not found" });
+
+    req.user = user;
     next();
   } catch (err) {
-    return res.status(401).json({ status: "ERROR", message: err.message });
+    return res
+      .status(401)
+      .json({ status: "ERROR", message: "Invalid or expired token" });
   }
-}
+};
 
-export function adminRequired(req, res, next) {
+export const adminRequired = (req, res, next) => {
   if (req.user.role !== "ADMIN") {
     return res
       .status(403)
       .json({ status: "ERROR", message: "Forbidden: Admins only" });
   }
   next();
-}
+};
