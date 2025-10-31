@@ -12,6 +12,7 @@ import "./models/album.model.js";
 import authRouter from "./routes/auth.route.js";
 import songRouter from "./routes/song.route.js";
 import albumRouter from "./routes/album.route.js";
+import historyRouter from "./routes/history.route.js";
 
 import { errorHandler } from "./middlewares/error-handler.js";
 
@@ -28,6 +29,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRouter);
 app.use("/api/songs", songRouter);
 app.use("/api/albums", albumRouter);
+app.use("/api/history", historyRouter);
 
 app.get("/", (req, res) => res.send("🎵 Music API running..."));
 
