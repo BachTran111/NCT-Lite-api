@@ -1,0 +1,50 @@
+I/ Auth :
+
+1. Register (POST)
+http://localhost:5000/api/auth/register
+{
+  "username": "admin",
+  "password": "123456",
+  "role": "USER"
+}
+
+2.Login (POST)
+http://localhost:5000/api/auth/login
+{
+  "username": "admin",
+  "password": "123456",
+  "role": "USER"
+}
+
+II/ Songs :
+
+1. Search (GET)
+http://localhost:5000/api/songs/search?title=em&artist=starling&genreIDs=6904b71c17e0459f0f5c8e62
+
+2. Add (POST, auth)
+http://localhost:5000/api/songs
+{
+  "title": "L'arc en ciel",
+  "artist": "L'arc en ciel",
+  "genreIDs": ["6904b71c17e0459f0f5c8e62", "6904b71c17e0459f0f5c8e6c"],
+  "url": "https://firebasestorage.googleapis.com/arc.mp3",
+  "coverUrl": "https://firebasestorage.googleapis.com/arc-cover.jpg"
+}
+
+III/ Albums :
+
+1. Get (GET)
+http://localhost:5000/api/albums/6904c1aa0fcf6f9fc4430ddb/songs
+
+2. Create (POST, auth)
+http://localhost:5000/api/albums
+{
+  "title": "ボッチ・ザ・ロック",
+  "artist": "結束バンド",
+  "songIDs": ["6904bc74d7adc9ead1930c9a"],
+  "genreIDs": ["6904b71c17e0459f0f5c8e62"],
+  "coverUrl": "https://firebasestorage.googleapis.com/bocchi-cover.jpg",
+  "releaseDate": "2025-10-30",
+  "description": "神の曲",
+  "isPublic": true
+}
