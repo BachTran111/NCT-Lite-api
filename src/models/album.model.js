@@ -1,28 +1,22 @@
-class Album {
-  constructor(
-    id,
-    title,
-    artist = "",
-    songIDs = [],
-    genreIDs = [],
-    coverUrl,
-    releaseDate,
-    description,
-    creatorId = null,
-    isPublic = true
-  ) {
-    this.id = id;
-    this.title = title;
-    this.artist = artist;
-    this.songIDs = songIDs;
-    this.genreIDs = genreIDs;
-    this.coverUrl = coverUrl; // ảnh bìa album
-    this.releaseDate = releaseDate;
-    this.description = description;
-    this.creatorId = creatorId; // id người tạo (nếu là user)
-    this.isPublic = isPublic;
-    this.createdAt = new Date().toISOString();
-  }
-}
+import mongoose from "mongoose";
 
-export default Album;
+const albumSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    artist: { type: String, default: "" }, // nghệ sĩ hoặc để trống nếu user tạo
+    songIDs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
+    genreIDs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
+    coverUrl: { type: String },
+    releaseDate: { type: Date },
+    description: { type: String },
+    creatorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    isPublic: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Album", albumSchema);

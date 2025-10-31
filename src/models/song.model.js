@@ -1,14 +1,15 @@
-class Song {
-  constructor(id, title, artist, genreIDs = [], url, coverUrl, uploaderId) {
-    this.id = id;
-    this.title = title;
-    this.artist = artist;
-    this.genreIDs = genreIDs;
-    this.url = url;
-    this.coverUrl = coverUrl; // Ảnh bìa
-    this.uploaderId = uploaderId;
-    this.createdAt = new Date().toISOString();
-  }
-}
+import mongoose from "mongoose";
 
-export default Song;
+const songSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    artist: { type: String, required: true },
+    genreIDs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
+    url: { type: String, required: true },
+    coverUrl: { type: String },
+    uploaderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Song", songSchema);

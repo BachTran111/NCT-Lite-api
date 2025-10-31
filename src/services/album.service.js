@@ -1,119 +1,55 @@
-import { readData, writeData, getNextId } from "../utils/fileDb.js";
 import Album from "../models/album.model.js";
 
 class AlbumService {
   async getAll() {
-    const data = await readData();
-    return (data.albums || []).filter((a) => a.isPublic);
+    return await Album.find({ isPublic: true }).populate("genreIDs", "name");
   }
 
   async getArtistAlbums() {
-    const data = await readData();
-    return (data.albums || []).filter(
-      (a) => a.isPublic && a.artist && a.artist.trim() !== ""
+    return await Album.find({ isPublic: true, artist: { $ne: "" } }).populate(
+      "genreIDs",
+      "name"
     );
   }
 
   async getUserAlbums(userId) {
-    const data = await readData();
-    return (data.albums || []).filter((a) => a.creatorId === userId);
+    return await Album.find({ creatorId: userId });
   }
 
   async getById(id, userId = null) {
-    const data = await readData();
-    const album = (data.albums || []).find((a) => a.id === Number(id));
+    const album = await Album.findById(id)
+      .populate("songIDs", "title artist coverUrl url")
+      .populate("genreIDs", "name");
     if (!album) throw new Error("Album not found");
 
-    if (!album.isPublic && album.creatorId !== userId) {
-      throw new Error("Access denied: private album");
+    if (!album.isPublic && album.creatorId?.toString() !== userId) {
+      throw new Error("Access denied");
     }
-
     return album;
   }
 
-  // Tạo album (phân biệt nghệ sĩ / người dùng)
-  async createAlbum({
-    title,
-    artist = "",
-    songIDs = [],
-    genreIDs = [],
-    coverUrl,
-    releaseDate,
-    description,
-    creatorId = null,
-    isPublic = true,
-  }) {
-    const data = await readData();
-    data.albums = data.albums || [];
-
-    const id = await getNextId("albums");
-
-    const album = new Album(
-      id,
-      title,
-      artist,
-      songIDs,
-      genreIDs,
-      coverUrl,
-      releaseDate,
-      description,
-      creatorId,
-      isPublic
-    );
-
-    data.albums.push(album);
-    await writeData(data);
-    return album;
+  async createAlbum(data) {
+    const album = new Album(data);
+    return await album.save();
   }
 
   async updateAlbum(id, updates, userId) {
-    const data = await readData();
-    data.albums = data.albums || [];
+    const album = await Album.findById(id);
+    if (!album) throw new Error("Album not found");
+    if (album.creatorId && album.creatorId.toString() !== userId)
+      throw new Error("Unauthorized");
 
-    const index = data.albums.findIndex((a) => a.id === Number(id));
-    if (index === -1) throw new Error("Album not found");
-
-    const album = data.albums[index];
-
-    // Nếu là user album thì kiểm tra quyền
-    if (album.creatorId && album.creatorId !== userId) {
-      throw new Error("Unauthorized: cannot edit this album");
-    }
-
-    data.albums[index] = { ...album, ...updates };
-    await writeData(data);
-    return data.albums[index];
+    Object.assign(album, updates);
+    return await album.save();
   }
 
   async deleteAlbum(id, userId) {
-    const data = await readData();
-    data.albums = data.albums || [];
-
-    const index = data.albums.findIndex((a) => a.id === Number(id));
-    if (index === -1) throw new Error("Album not found");
-
-    const album = data.albums[index];
-    if (album.creatorId && album.creatorId !== userId) {
-      throw new Error("Unauthorized: cannot delete this album");
-    }
-
-    const deleted = data.albums.splice(index, 1)[0];
-    await writeData(data);
-    return deleted;
-  }
-
-  async getSongsInAlbum(id, userId = null) {
-    const data = await readData();
-    const album = (data.albums || []).find((a) => a.id === Number(id));
+    const album = await Album.findById(id);
     if (!album) throw new Error("Album not found");
+    if (album.creatorId && album.creatorId.toString() !== userId)
+      throw new Error("Unauthorized");
 
-    if (!album.isPublic && album.creatorId !== userId) {
-      throw new Error("Access denied: private album");
-    }
-
-    const allSongs = data.songs || [];
-    const songs = allSongs.filter((song) => album.songIDs.includes(song.id));
-    return { album, songs };
+    return await album.deleteOne();
   }
 }
 
