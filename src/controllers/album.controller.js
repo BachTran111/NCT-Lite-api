@@ -13,16 +13,17 @@ class AlbumController {
     }
   };
 
-  // Album nổi bật
   getFeatured = async (req, res, next) => {
     try {
       const albums = await AlbumService.getArtistAlbums();
-      res.status(200).json(
-        new OK({
-          message: "Fetched featured artist albums",
-          metadata: albums,
-        })
-      );
+      res
+        .status(200)
+        .json(
+          new OK({
+            message: "Fetched featured artist albums",
+            metadata: albums,
+          })
+        );
     } catch (err) {
       next(err);
     }
@@ -30,7 +31,7 @@ class AlbumController {
 
   getUserAlbums = async (req, res, next) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user._id.toString();
       const albums = await AlbumService.getUserAlbums(userId);
       res
         .status(200)
@@ -42,7 +43,7 @@ class AlbumController {
 
   getById = async (req, res, next) => {
     try {
-      const userId = req.user?.id || null;
+      const userId = req.user?._id?.toString() || null;
       const album = await AlbumService.getById(req.params.id, userId);
       res
         .status(200)
@@ -54,11 +55,9 @@ class AlbumController {
 
   create = async (req, res, next) => {
     try {
-      const userId = req.user.id;
-      const { artist } = req.body;
-
-      // không gán creatorId
-      const creatorId = artist && artist.trim() !== "" ? null : userId;
+      const userId = req.user._id.toString();
+      const artistName = req.body.artist?.trim() || "";
+      const creatorId = artistName !== "" ? null : userId;
 
       const album = await AlbumService.createAlbum({ ...req.body, creatorId });
       res
@@ -71,7 +70,7 @@ class AlbumController {
 
   update = async (req, res, next) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user._id.toString();
       const updated = await AlbumService.updateAlbum(
         req.params.id,
         req.body,
@@ -87,7 +86,7 @@ class AlbumController {
 
   delete = async (req, res, next) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user._id.toString();
       const deleted = await AlbumService.deleteAlbum(req.params.id, userId);
       res
         .status(200)
@@ -99,9 +98,8 @@ class AlbumController {
 
   getSongsInAlbum = async (req, res, next) => {
     try {
-      const userId = req.user?.id || null;
+      const userId = req.user?._id?.toString() || null;
       const result = await AlbumService.getSongsInAlbum(req.params.id, userId);
-
       res.status(200).json(
         new OK({
           message: `Fetched songs in album '${result.album.title}'`,

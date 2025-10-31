@@ -17,8 +17,9 @@ class SongController {
     try {
       let { title, artist, genreIDs } = req.query;
       if (typeof genreIDs === "string") {
-        genreIDs = genreIDs.split(",").map(Number);
+        genreIDs = genreIDs.split(",");
       }
+
       const songs = await SongService.searchSongs({ title, artist, genreIDs });
       res
         .status(200)
@@ -40,6 +41,8 @@ class SongController {
   create = async (req, res, next) => {
     try {
       const { title, artist, genreIDs, url, coverUrl } = req.body;
+      if (!title || !url) throw new Error("Title and URL are required");
+
       const uploaderId = req.user?.id || null;
       const song = await SongService.createSong({
         title,
@@ -49,6 +52,7 @@ class SongController {
         coverUrl,
         uploaderId,
       });
+
       res.status(201).json(new OK({ message: "Song created", metadata: song }));
     } catch (err) {
       next(err);

@@ -4,6 +4,11 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
+import "./models/user.model.js";
+import "./models/genre.model.js";
+import "./models/song.model.js";
+import "./models/album.model.js";
+
 import authRouter from "./routes/auth.route.js";
 import songRouter from "./routes/song.route.js";
 import albumRouter from "./routes/album.route.js";
