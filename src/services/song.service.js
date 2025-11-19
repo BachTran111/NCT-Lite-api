@@ -1,4 +1,5 @@
 import Song from "../models/song.model.js";
+import Artist from "../models/artist.model.js";
 import mongoose from "mongoose";
 
 class SongService {
@@ -35,6 +36,27 @@ class SongService {
     return song;
   }
 
+  // async createSong({
+  //   title,
+  //   artist,
+  //   genreIDs = [],
+  //   url,
+  //   coverUrl,
+  //   uploaderId,
+  // }) {
+  //   if (!title || !url) throw new Error("Title and URL are required");
+
+  //   const song = new Song({
+  //     title,
+  //     artist,
+  //     genreIDs,
+  //     url,
+  //     coverUrl,
+  //     uploaderId,
+  //   });
+  //   return await song.save();
+  // }
+
   async createSong({
     title,
     artist,
@@ -45,6 +67,14 @@ class SongService {
   }) {
     if (!title || !url) throw new Error("Title and URL are required");
 
+    // Tự tạo artist nếu chưa có
+    if (artist) {
+      const exists = await Artist.findOne({ name: artist.trim() });
+      if (!exists) {
+        await Artist.create({ name: artist.trim() });
+      }
+    }
+
     const song = new Song({
       title,
       artist,
@@ -53,6 +83,7 @@ class SongService {
       coverUrl,
       uploaderId,
     });
+
     return await song.save();
   }
 

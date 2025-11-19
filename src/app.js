@@ -8,11 +8,13 @@ import "./models/user.model.js";
 import "./models/genre.model.js";
 import "./models/song.model.js";
 import "./models/album.model.js";
+import "./models/artist.model.js";
 
 import authRouter from "./routes/auth.route.js";
 import songRouter from "./routes/song.route.js";
 import albumRouter from "./routes/album.route.js";
 import historyRouter from "./routes/history.route.js";
+import artistRouter from "./routes/artist.route.js";
 import uploadRouter from "./routes/upload.route.js";
 
 import { errorHandler } from "./middlewares/error-handler.js";
@@ -31,12 +33,13 @@ app.use("/api/auth", authRouter);
 app.use("/api/songs", songRouter);
 app.use("/api/albums", albumRouter);
 app.use("/api/history", historyRouter);
+app.use("/api/artists", artistRouter);
 app.use("/api/upload", uploadRouter);
 
-app.get("/", (req, res) => res.send("🎵 Music API running..."));
+app.get("/", (req, res) => res.send(" Music API running..."));
 
 app.use(errorHandler);
 
 app.listen(PORT, () =>
-  console.log(`🚀 Server running at http://localhost:${PORT}`)
+  console.log(` Server running at http://localhost:${PORT}`)
 );
