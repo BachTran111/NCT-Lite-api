@@ -1,5 +1,6 @@
 import Song from "../models/song.model.js";
 import Artist from "../models/artist.model.js";
+import UploadService from "../services/upload.service.js";
 import mongoose from "mongoose";
 
 class SongService {
@@ -115,9 +116,26 @@ class SongService {
   }
 
   async deleteSong(id) {
-    const deleted = await Song.findByIdAndDelete(id).lean();
-    if (!deleted) throw new Error("Song not found");
-    return deleted;
+    // 1. Lấy bài hát để có publicId
+    const song = await Song.findById(id).lean();
+    if (!song) throw new Error("Song not found");
+
+    // 2. Xoá file trên Cloudinary
+    try {
+      if (song.songPublicId) {
+        await UploadService.deleteFile(song.songPublicId, "song");
+      }
+      if (song.coverPublicId) {
+        await UploadService.deleteFile(song.coverPublicId, "image");
+      }
+    } catch (err) {
+      console.error("Failed to delete files on Cloudinary:", err.message);
+    }
+
+    // 3. Xoá document trong DB
+    await Song.findByIdAndDelete(id);
+
+    return song; // trả về bài vừa xoá
   }
 }
 

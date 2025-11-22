@@ -9,6 +9,8 @@ const songSchema = new mongoose.Schema(
     coverUrl: { type: String },
     uploaderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     isApproved: { type: Boolean, default: false },
+    songPublicId: { type: String },
+    coverPublicId: { type: String },
   },
   { timestamps: true }
 );
