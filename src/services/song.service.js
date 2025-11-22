@@ -4,7 +4,14 @@ import mongoose from "mongoose";
 
 class SongService {
   async getAll() {
-    return await Song.find()
+    return await Song.find({ isApproved: true })
+      .populate("genreIDs", "name")
+      .populate("uploaderId", "username")
+      .lean();
+  }
+
+  async getAllPending() {
+    return await Song.find({ isApproved: false })
       .populate("genreIDs", "name")
       .populate("uploaderId", "username")
       .lean();

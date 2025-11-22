@@ -14,6 +14,20 @@ class SongController {
     }
   };
 
+  getAllPending = async (req, res, next) => {
+    try {
+      const songs = await SongService.getAllPending();
+      res.status(200).json(
+        new OK({
+          message: "Fetched pending songs",
+          metadata: songs,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
   search = async (req, res, next) => {
     try {
       let { title, artist, genreIDs } = req.query;

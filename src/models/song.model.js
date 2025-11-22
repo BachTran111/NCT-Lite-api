@@ -8,6 +8,7 @@ const songSchema = new mongoose.Schema(
     url: { type: String, required: true },
     coverUrl: { type: String },
     uploaderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    isApproved: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
