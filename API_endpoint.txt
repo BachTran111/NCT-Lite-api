@@ -42,16 +42,20 @@ http://localhost:5000/api/albums/6904c1aa0fcf6f9fc4430ddb/songs
 
 2. Create (POST, auth)
 http://localhost:5000/api/albums
-{
-  "title": "ボッチ・ザ・ロック",
-  "artist": "結束バンド",
-  "songIDs": ["6904bc74d7adc9ead1930c9a"],
-  "genreIDs": ["6904b71c17e0459f0f5c8e62"],
-  "coverUrl": "https://firebasestorage.googleapis.com/bocchi-cover.jpg",
-  "releaseDate": "2025-10-30",
-  "description": "神の曲",
-  "isPublic": true
-}
+
+(form-data)
+
+  "title": "ボッチ・ザ・ロック"
+  "artist": "結束バンド"
+  "genreIDs": ["6904b71c17e0459f0f5c8e62"]
+  "cover"(file): "File From PC",
+
+3. Add Song to Album (PUT, AUTH)
+http://localhost:5000/api/albums/6921554b327f4e2d85bf2cfe/add-song
+
+4. Remove Song to Album (DELETE, AUTH)
+http://localhost:5000/api/albums/6921554b327f4e2d85bf2cfe/remove-song/SONG_ID
+
 
 IV/ History :
 1. Get (GET, auth)
