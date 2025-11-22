@@ -23,13 +23,17 @@ http://localhost:5000/api/songs/search?title=em&artist=starling&genreIDs=6904b71
 
 2. Add (POST, auth)
 http://localhost:5000/api/songs
-{
+
+(form-data)
+
   "title": "L'arc en ciel",
   "artist": "L'arc en ciel",
   "genreIDs": ["6904b71c17e0459f0f5c8e62", "6904b71c17e0459f0f5c8e6c"],
-  "url": "https://firebasestorage.googleapis.com/arc.mp3",
-  "coverUrl": "https://firebasestorage.googleapis.com/arc-cover.jpg"
-}
+  "song"(file): "File from PC",
+  "cover"(file): "File from PC"
+
+3. Delete (DELETE, auth)
+http://localhost:5000/api/songs/69214844f238574934d9cd72
 
 III/ Albums :
 
@@ -63,3 +67,13 @@ V/ Upload :
 1. Upload music (POST, auth)
 http://localhost:5000/api/upload/song
 form-data : key = file 
+
+VI/ admin
+1. View Pending List (GET, auth, admin)
+http://localhost:5000/api/songs/pending
+
+2. Approve Song (PUT, auth, admin)
+http://localhost:5000/api/songs/69214a880efd42c9f59124c3/approve
+
+3. Reject Song (PUT, auth, admin)
+http://localhost:5000/api/songs/69214a880efd42c9f59124c3/reject
