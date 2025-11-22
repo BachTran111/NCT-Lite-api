@@ -92,30 +92,40 @@ class AlbumService {
   }
 
   async addSongToAlbum(albumId, songId, userId) {
+    if (!songId) throw new Error("songId is required");
+
     const album = await Album.findById(albumId);
     if (!album) throw new Error("Album not found");
 
     if (album.creatorId && album.creatorId.toString() !== userId)
       throw new Error("Unauthorized: cannot edit this album");
 
-    if (!album.songIDs.includes(songId)) {
+    // Normalize ID
+    const songIdStr = songId.toString();
+
+    if (!Array.isArray(album.songIDs)) {
+      album.songIDs = [];
+    }
+
+    const exists = album.songIDs.some(
+      (id) => id && id.toString() === songIdStr
+    );
+
+    if (!exists) {
       album.songIDs.push(songId);
       await album.save();
     }
 
-    // populate đúng cách
-    await album.populate([
-      {
+    // Load lại album
+    const populatedAlbum = await Album.findById(albumId)
+      .populate({
         path: "songIDs",
         select: "title artist coverUrl",
-      },
-      {
-        path: "genreIDs",
-        select: "name",
-      },
-    ]);
+      })
+      .populate("genreIDs", "name")
+      .lean();
 
-    return album;
+    return populatedAlbum;
   }
 
   async removeSongFromAlbum(albumId, songId, userId) {
