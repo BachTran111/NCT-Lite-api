@@ -1,4 +1,5 @@
 import AlbumService from "../services/album.service.js";
+import UploadService from "../services/upload.service.js";
 import { OK } from "../handler/success-response.js";
 
 class AlbumController {
@@ -16,14 +17,12 @@ class AlbumController {
   getFeatured = async (req, res, next) => {
     try {
       const albums = await AlbumService.getArtistAlbums();
-      res
-        .status(200)
-        .json(
-          new OK({
-            message: "Fetched featured artist albums",
-            metadata: albums,
-          })
-        );
+      res.status(200).json(
+        new OK({
+          message: "Fetched featured artist albums",
+          metadata: albums,
+        })
+      );
     } catch (err) {
       next(err);
     }
@@ -56,10 +55,20 @@ class AlbumController {
   create = async (req, res, next) => {
     try {
       const userId = req.user._id.toString();
-      const artistName = req.body.artist?.trim() || "";
-      const creatorId = artistName !== "" ? null : userId;
 
-      const album = await AlbumService.createAlbum({ ...req.body, creatorId });
+      let coverUrl = req.body.coverUrl;
+
+      if (req.file) {
+        const up = await UploadService.uploadCover(req.file.buffer);
+        coverUrl = up.secure_url;
+      }
+
+      const album = await AlbumService.createAlbum({
+        ...req.body,
+        coverUrl,
+        creatorId: userId,
+      });
+
       res
         .status(201)
         .json(new OK({ message: "Album created", metadata: album }));
@@ -71,11 +80,20 @@ class AlbumController {
   update = async (req, res, next) => {
     try {
       const userId = req.user._id.toString();
+
+      let updates = { ...req.body };
+
+      if (req.file) {
+        const up = await UploadService.uploadCover(req.file.buffer);
+        updates.coverUrl = up.secure_url;
+      }
+
       const updated = await AlbumService.updateAlbum(
         req.params.id,
-        req.body,
+        updates,
         userId
       );
+
       res
         .status(200)
         .json(new OK({ message: "Album updated", metadata: updated }));
@@ -103,6 +121,48 @@ class AlbumController {
       res.status(200).json(
         new OK({
           message: `Fetched songs in album '${result.album.title}'`,
+          metadata: result,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  addSong = async (req, res, next) => {
+    try {
+      const albumId = req.params.id;
+      const { songId } = req.body;
+      const userId = req.user._id.toString();
+
+      const result = await AlbumService.addSongToAlbum(albumId, songId, userId);
+
+      res.status(200).json(
+        new OK({
+          message: "Song added to album",
+          metadata: result,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  removeSong = async (req, res, next) => {
+    try {
+      const albumId = req.params.id;
+      const songId = req.params.songId;
+      const userId = req.user._id.toString();
+
+      const result = await AlbumService.removeSongFromAlbum(
+        albumId,
+        songId,
+        userId
+      );
+
+      res.status(200).json(
+        new OK({
+          message: "Song removed from album",
           metadata: result,
         })
       );

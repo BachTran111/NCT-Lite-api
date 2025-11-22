@@ -1,5 +1,6 @@
 import Song from "../models/song.model.js";
 import Artist from "../models/artist.model.js";
+import Album from "../models/album.model.js";
 import UploadService from "../services/upload.service.js";
 import mongoose from "mongoose";
 
@@ -124,7 +125,7 @@ class SongService {
       );
     }
 
-    // Tự tạo artist nếu có tên nghệ sĩ 
+    // Tự tạo artist nếu có tên nghệ sĩ
     if (artist && artist.trim()) {
       const exists = await Artist.findOne({ name: artist.trim() });
       if (!exists) await Artist.create({ name: artist.trim() });
@@ -172,6 +173,7 @@ class SongService {
 
     // 3. Xoá document trong DB
     await Song.findByIdAndDelete(id);
+    await Album.updateMany({ songIDs: songId }, { $pull: { songIDs: songId } });
 
     return song; // trả về bài vừa xoá
   }
