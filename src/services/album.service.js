@@ -90,6 +90,60 @@ class AlbumService {
 
     return { album, songs: album.songIDs };
   }
+
+  async addSongToAlbum(albumId, songId, userId) {
+    const album = await Album.findById(albumId);
+    if (!album) throw new Error("Album not found");
+
+    if (album.creatorId && album.creatorId.toString() !== userId)
+      throw new Error("Unauthorized: cannot edit this album");
+
+    if (!album.songIDs.includes(songId)) {
+      album.songIDs.push(songId);
+      await album.save();
+    }
+
+    // populate đúng cách
+    await album.populate([
+      {
+        path: "songIDs",
+        select: "title artist coverUrl",
+      },
+      {
+        path: "genreIDs",
+        select: "name",
+      },
+    ]);
+
+    return album;
+  }
+
+  async removeSongFromAlbum(albumId, songId, userId) {
+    const album = await Album.findById(albumId);
+    if (!album) throw new Error("Album not found");
+
+    if (album.creatorId && album.creatorId.toString() !== userId)
+      throw new Error("Unauthorized: cannot edit this album");
+
+    album.songIDs = album.songIDs.filter(
+      (id) => id.toString() !== songId.toString()
+    );
+
+    await album.save();
+
+    await album.populate([
+      {
+        path: "songIDs",
+        select: "title artist coverUrl",
+      },
+      {
+        path: "genreIDs",
+        select: "name",
+      },
+    ]);
+
+    return album;
+  }
 }
 
 export default new AlbumService();

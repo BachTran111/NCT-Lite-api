@@ -14,6 +14,48 @@ class SongController {
     }
   };
 
+  getAllPending = async (req, res, next) => {
+    try {
+      const songs = await SongService.getAllPending();
+      res.status(200).json(
+        new OK({
+          message: "Fetched pending songs",
+          metadata: songs,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  approveSong = async (req, res, next) => {
+    try {
+      const song = await SongService.approveSong(req.params.id);
+      res.status(200).json(
+        new OK({
+          message: "Song approved",
+          metadata: song,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  rejectSong = async (req, res, next) => {
+    try {
+      const song = await SongService.rejectSong(req.params.id);
+      res.status(200).json(
+        new OK({
+          message: "Song rejected and deleted",
+          metadata: song,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
   search = async (req, res, next) => {
     try {
       let { title, artist, genreIDs } = req.query;

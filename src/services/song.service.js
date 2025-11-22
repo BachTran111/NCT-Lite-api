@@ -1,17 +1,64 @@
 import Song from "../models/song.model.js";
 import Artist from "../models/artist.model.js";
+import Album from "../models/album.model.js";
+import UploadService from "../services/upload.service.js";
 import mongoose from "mongoose";
 
 class SongService {
   async getAll() {
-    return await Song.find()
+    return await Song.find({ isApproved: true })
       .populate("genreIDs", "name")
       .populate("uploaderId", "username")
       .lean();
   }
 
+  async getAllPending() {
+    return await Song.find({ isApproved: false })
+      .populate("genreIDs", "name")
+      .populate("uploaderId", "username")
+      .lean();
+  }
+
+  async approveSong(id) {
+    const updated = await Song.findByIdAndUpdate(
+      id,
+      { isApproved: true },
+      { new: true }
+    );
+    if (!updated) throw new Error("Song not found");
+    return updated;
+  }
+
+  async rejectSong(id) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const song = await Song.findById(id).session(session);
+      if (!song) throw new Error("Song not found");
+
+      if (song.songPublicId) {
+        await UploadService.deleteFile(song.songPublicId, "video");
+      }
+      if (song.coverPublicId) {
+        await UploadService.deleteFile(song.coverPublicId, "image");
+      }
+
+      await Song.findByIdAndDelete(id).session(session);
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return song.toObject();
+    } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+      throw err;
+    }
+  }
+
   async searchSongs({ title, artist, genreIDs }) {
-    const query = {};
+    const query = { isApproved: true };
     if (title) query.title = new RegExp(title, "i");
     if (artist) query.artist = new RegExp(artist, "i");
 
@@ -69,7 +116,7 @@ class SongService {
   }) {
     if (!title || !url) throw new Error("Title and URL are required");
 
-    // Ép kiểu ObjectId cho genreIDs nếu cần
+    // Ép kiểu ObjectId cho genreIDs
     if (genreIDs?.length) {
       genreIDs = genreIDs.map((id) =>
         mongoose.Types.ObjectId.isValid(id)
@@ -78,7 +125,7 @@ class SongService {
       );
     }
 
-    // Tự tạo artist nếu có tên nghệ sĩ (tuỳ bạn dùng bảng artist hay không)
+    // Tự tạo artist nếu có tên nghệ sĩ
     if (artist && artist.trim()) {
       const exists = await Artist.findOne({ name: artist.trim() });
       if (!exists) await Artist.create({ name: artist.trim() });
@@ -108,9 +155,27 @@ class SongService {
   }
 
   async deleteSong(id) {
-    const deleted = await Song.findByIdAndDelete(id).lean();
-    if (!deleted) throw new Error("Song not found");
-    return deleted;
+    // 1. Lấy bài hát để có publicId
+    const song = await Song.findById(id).lean();
+    if (!song) throw new Error("Song not found");
+
+    // 2. Xoá file trên Cloudinary
+    try {
+      if (song.songPublicId) {
+        await UploadService.deleteFile(song.songPublicId, "video");
+      }
+      if (song.coverPublicId) {
+        await UploadService.deleteFile(song.coverPublicId, "image");
+      }
+    } catch (err) {
+      console.error("Failed to delete files on Cloudinary:", err.message);
+    }
+
+    // 3. Xoá document trong DB
+    await Song.findByIdAndDelete(id);
+    await Album.updateMany({ songIDs: songId }, { $pull: { songIDs: songId } });
+
+    return song; // trả về bài vừa xoá
   }
 }
 
