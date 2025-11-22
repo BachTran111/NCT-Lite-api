@@ -123,7 +123,7 @@ class SongService {
     // 2. Xoá file trên Cloudinary
     try {
       if (song.songPublicId) {
-        await UploadService.deleteFile(song.songPublicId, "song");
+        await UploadService.deleteFile(song.songPublicId, "video");
       }
       if (song.coverPublicId) {
         await UploadService.deleteFile(song.coverPublicId, "image");
