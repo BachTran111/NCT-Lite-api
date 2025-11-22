@@ -64,15 +64,24 @@ class SongService {
     url,
     coverUrl,
     uploaderId,
+    songPublicId,
+    coverPublicId,
   }) {
     if (!title || !url) throw new Error("Title and URL are required");
 
-    // Tự tạo artist nếu chưa có
-    if (artist) {
+    // Ép kiểu ObjectId cho genreIDs nếu cần
+    if (genreIDs?.length) {
+      genreIDs = genreIDs.map((id) =>
+        mongoose.Types.ObjectId.isValid(id)
+          ? id
+          : new mongoose.Types.ObjectId(id)
+      );
+    }
+
+    // Tự tạo artist nếu có tên nghệ sĩ (tuỳ bạn dùng bảng artist hay không)
+    if (artist && artist.trim()) {
       const exists = await Artist.findOne({ name: artist.trim() });
-      if (!exists) {
-        await Artist.create({ name: artist.trim() });
-      }
+      if (!exists) await Artist.create({ name: artist.trim() });
     }
 
     const song = new Song({
@@ -82,6 +91,8 @@ class SongService {
       url,
       coverUrl,
       uploaderId,
+      songPublicId,
+      coverPublicId,
     });
 
     return await song.save();

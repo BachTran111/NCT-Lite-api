@@ -1,4 +1,5 @@
 import SongService from "../services/song.service.js";
+import UploadService from "../services/upload.service.js";
 import { OK } from "../handler/success-response.js";
 
 class SongController {
@@ -40,10 +41,38 @@ class SongController {
 
   create = async (req, res, next) => {
     try {
-      const { title, artist, genreIDs, url, coverUrl } = req.body;
-      if (!title || !url) throw new Error("Title and URL are required");
+      let { title, artist, genreIDs, url, coverUrl } = req.body;
+      if (!title) throw new Error("Title is required");
 
-      const uploaderId = req.user?.id || null;
+      // Chuẩn hoá genreIDs từ form-data (string) -> array
+      // chấp nhận: ["id1","id2"] hoặc "id1,id2"
+      if (typeof genreIDs === "string") {
+        try {
+          const maybeJson = JSON.parse(genreIDs);
+          genreIDs = Array.isArray(maybeJson) ? maybeJson : genreIDs.split(",");
+        } catch {
+          genreIDs = genreIDs.split(",");
+        }
+      }
+
+      let songPublicId, coverPublicId;
+
+      if (req.files?.song?.[0]) {
+        const up = await UploadService.uploadSong(req.files.song[0].buffer);
+        url = up.secure_url;
+        songPublicId = up.public_id;
+      }
+      if (req.files?.cover?.[0]) {
+        const up2 = await UploadService.uploadCover(req.files.cover[0].buffer);
+        coverUrl = up2.secure_url;
+        coverPublicId = up2.public_id;
+      }
+
+      if (!url)
+        throw new Error("URL is required (provide file 'song' or a 'url')");
+
+      const uploaderId = req.user?._id || req.user?.id || null;
+
       const song = await SongService.createSong({
         title,
         artist,
@@ -51,6 +80,8 @@ class SongController {
         url,
         coverUrl,
         uploaderId,
+        songPublicId,
+        coverPublicId,
       });
 
       res.status(201).json(new OK({ message: "Song created", metadata: song }));
