@@ -58,15 +58,22 @@ class SongService {
   }
 
   async searchSongs({ title, artist, genreIDs }) {
-    const query = { isApproved: true };
-    if (title) query.title = new RegExp(title, "i");
-    if (artist) query.artist = new RegExp(artist, "i");
+    const query = {
+      isApproved: true,
+      $or: [],
+    };
+    if (title) query.$or.push({ title: new RegExp(title, "i") });
+    if (artist) query.$or.push({ artist: new RegExp(artist, "i") });
 
     if (genreIDs && genreIDs.length > 0) {
-      query.genreIDs = {
-        $in: genreIDs.map((id) => new mongoose.Types.ObjectId(id)),
-      };
+      query.$or.push({
+        genreIDs: {
+          $in: genreIDs.map((id) => new mongoose.Types.ObjectId(id)),
+        },
+      });
     }
+
+    if (query.$or.length === 0) delete query.$or;
 
     return await Song.find(query)
       .populate("genreIDs", "name")
