@@ -28,6 +28,22 @@ class SongController {
     }
   };
 
+  getMySongs = async (req, res, next) => {
+    try {
+      const userId = req.user._id.toString();
+      const songs = await SongService.getMySongs(userId);
+
+      res.status(200).json(
+        new OK({
+          message: "Fetched your uploaded songs",
+          metadata: songs,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
   approveSong = async (req, res, next) => {
     try {
       const song = await SongService.approveSong(req.params.id);

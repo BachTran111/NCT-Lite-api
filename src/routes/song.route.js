@@ -10,6 +10,7 @@ router.get("/pending", authRequired, adminRequired, SongController.getAllPending
 router.put("/:id/approve", authRequired, adminRequired, SongController.approveSong);
 router.delete("/:id/reject", authRequired, adminRequired, SongController.rejectSong);
 
+router.get("/me", authRequired, SongController.getMySongs);
 router.get("/", SongController.getAll);
 router.get("/search", SongController.search);
 router.get("/:id", SongController.getById);

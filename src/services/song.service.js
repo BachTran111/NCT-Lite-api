@@ -19,6 +19,13 @@ class SongService {
       .lean();
   }
 
+  async getMySongs(userId) {
+    return await Song.find({ uploaderId: userId })
+      .populate("genreIDs", "name")
+      .populate("uploaderId", "username")
+      .lean();
+  }
+
   async approveSong(id) {
     const updated = await Song.findByIdAndUpdate(
       id,
