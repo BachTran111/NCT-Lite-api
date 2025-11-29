@@ -16,6 +16,7 @@ import albumRouter from "./routes/album.route.js";
 import historyRouter from "./routes/history.route.js";
 import artistRouter from "./routes/artist.route.js";
 import uploadRouter from "./routes/upload.route.js";
+import genreRoutes from "./routes/genre.route.js";
 
 import { errorHandler } from "./middlewares/error-handler.js";
 
@@ -31,6 +32,7 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRouter);
 app.use("/api/songs", songRouter);
+app.use("/api/genres", genreRoutes);
 app.use("/api/albums", albumRouter);
 app.use("/api/history", historyRouter);
 app.use("/api/artists", artistRouter);
