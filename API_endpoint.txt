@@ -35,6 +35,9 @@ http://localhost:5000/api/songs
 3. Delete (DELETE, auth)
 http://localhost:5000/api/songs/69214844f238574934d9cd72
 
+4. Get my uploaded song (GET, auth)
+http://localhost:5000/api/songs/me
+
 III/ Albums :
 
 1. Get (GET)
@@ -56,6 +59,17 @@ http://localhost:5000/api/albums/6921554b327f4e2d85bf2cfe/add-song
 4. Remove Song to Album (DELETE, AUTH)
 http://localhost:5000/api/albums/6921554b327f4e2d85bf2cfe/remove-song/SONG_ID
 
+5. Like A Song (POST, AUTH)
+http://localhost:5000/api/songs/69215036741b4929bd1aea49/like
+
+6. Save A Public Album (POST, AUTH)
+http://localhost:5000/api/albums/6921554b327f4e2d85bf2cfe/save
+
+7. Unsave An Album (DELETE, AUTH)
+http://localhost:5000/api/albums/6921554b327f4e2d85bf2cfe/save
+
+8. Get my saved Album (GET, AUTH)
+http://localhost:5000/api/albums/me/saved
 
 IV/ History :
 1. Get (GET, auth)
@@ -81,3 +95,4 @@ http://localhost:5000/api/songs/69214a880efd42c9f59124c3/approve
 
 3. Reject Song (PUT, auth, admin)
 http://localhost:5000/api/songs/69214a880efd42c9f59124c3/reject
+

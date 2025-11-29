@@ -1,5 +1,6 @@
 import AlbumService from "../services/album.service.js";
 import UploadService from "../services/upload.service.js";
+import UserAlbumService from "../services/user-album.service.js";
 import { OK } from "../handler/success-response.js";
 
 class AlbumController {
@@ -164,6 +165,58 @@ class AlbumController {
         new OK({
           message: "Song removed from album",
           metadata: result,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  saveAlbum = async (req, res, next) => {
+    try {
+      const userId = req.user._id.toString();
+      const albumId = req.params.id;
+
+      const link = await UserAlbumService.savePublicAlbum(userId, albumId);
+
+      res.status(200).json(
+        new OK({
+          message: "Album saved to your library",
+          metadata: link,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  unsaveAlbum = async (req, res, next) => {
+    try {
+      const userId = req.user._id.toString();
+      const albumId = req.params.id;
+
+      await UserAlbumService.unsavePublicAlbum(userId, albumId);
+
+      res.status(200).json(
+        new OK({
+          message: "Album removed from your library",
+          metadata: null,
+        })
+      );
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getMySavedAlbums = async (req, res, next) => {
+    try {
+      const userId = req.user._id.toString();
+      const albums = await UserAlbumService.getMySavedAlbums(userId);
+
+      res.status(200).json(
+        new OK({
+          message: "Fetched your saved albums",
+          metadata: albums,
         })
       );
     } catch (err) {
