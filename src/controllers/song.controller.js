@@ -1,5 +1,7 @@
 import SongService from "../services/song.service.js";
 import UploadService from "../services/upload.service.js";
+import UserAlbumService from "../services/user-album.service.js";
+import AlbumService from "../services/album.service.js";
 import { OK } from "../handler/success-response.js";
 
 class SongController {
@@ -165,6 +167,32 @@ class SongController {
       res
         .status(200)
         .json(new OK({ message: "Song deleted", metadata: deleted }));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  likeSong = async (req, res, next) => {
+    try {
+      const userId = req.user._id.toString();
+      const songId = req.params.id;
+
+      const favoriteAlbum = await UserAlbumService.getOrCreateFavoriteAlbum(
+        userId
+      );
+
+      const updatedAlbum = await AlbumService.addSongToAlbum(
+        favoriteAlbum._id.toString(),
+        songId,
+        userId
+      );
+
+      res.status(200).json(
+        new OK({
+          message: "Song added to your favorite album",
+          metadata: updatedAlbum,
+        })
+      );
     } catch (err) {
       next(err);
     }

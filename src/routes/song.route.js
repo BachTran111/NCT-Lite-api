@@ -15,6 +15,7 @@ router.get("/", SongController.getAll);
 router.get("/search", SongController.search);
 router.get("/:id", SongController.getById);
 
+router.post("/:id/like", authRequired, SongController.likeSong);
 router.post(
   "/",
   authRequired,
